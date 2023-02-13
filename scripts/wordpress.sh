@@ -3,12 +3,12 @@
  # A shell script for automatic wordpress download & installation for lazy folks !
  # Made by https://github.com/yasarkaancan/
 
- # Requirements: wget, unzip, mysql
+ # Requirements: wget, unzip, mysql , sudo
 
  # How to use ? :
  # Place this script in to your servers root folder.
- # Make it executable with chmod +x wp.sh if not
- # Run it with ./wp.sh
+ # Make it executable and give permissions with - sudo chmod u+x wp.sh
+ # Run it with - ./wp.sh
  # Follow the instructions
  # Enjoy !
 
@@ -37,7 +37,36 @@
  read folder_name
 
  echo "Creating database..."
- mysql -u $db_username -p$db_password -e "CREATE DATABASE $db_name" 
+ 
+ # Check the mysql user and password is correct
+    mysql -u $db_username -p$db_password -e "exit"
+    if [ $? -ne 0 ]; then
+        echo "Error: Incorrect mysql username or password"
+
+        echo "Do you want to create a new mysql user ? (y/n)"
+        read create_user
+
+        if [[ $create_user =~ ^([yY][eE][sS]|[yY])$ ]]
+        then
+        echo "Enter new mysql username:"
+        read db_username
+
+        echo "Enter new mysql password:"
+        read db_password
+
+        echo "Enter the mysql root password:"
+        read root_password
+
+        mysql -u root -p$root_password -e "CREATE USER '$db_username'@'$db_host' IDENTIFIED BY '$db_password';"
+        mysql -u root -p$root_password -e "GRANT ALL PRIVILEGES ON * . * TO '$db_username'@'$db_host';"
+        mysql -u root -p$root_password -e "FLUSH PRIVILEGES;"
+        else
+        echo "Exitting ..."
+        exit 1
+        fi
+    fi
+
+    mysql -u $db_username -p$db_password -e "CREATE DATABASE IF NOT EXISTS $db_name"
 
  echo "Downloading latest Wordpress version..."
  wget https://wordpress.org/latest.zip

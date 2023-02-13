@@ -8,7 +8,7 @@
  # How to use ? :
  # Place this script in to your servers root folder.
  # Make it executable and give permissions with - sudo chmod u+x wp.sh
- # Run it with - ./wp.sh
+ # Run it with - ./wordpress.sh
  # Follow the instructions
  # Enjoy !
 
